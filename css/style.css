@@ -218,11 +218,13 @@ main, .footer { width: min(100% - 3rem, var(--maxw)); margin-inline: auto; }
 
 .intro-line .word, .intro-line .hl {
   display: inline-block;
+}
+html.js .intro-line .word, html.js .intro-line .hl {
   opacity: 0; transform: translateY(10px);
   transition: opacity 0.72s var(--ease-out), transform 0.72s var(--ease-out),
               color 0.3s var(--ease);
 }
-.intro-line.in .word, .intro-line.in .hl { opacity: 1; transform: none; }
+html.js .intro-line.in .word, html.js .intro-line.in .hl { opacity: 1; transform: none; }
 .intro-line .hl:hover, .intro-line .hl:focus-visible { color: var(--on-fill); }
 
 .intro-sub {
@@ -436,11 +438,12 @@ main, .footer { width: min(100% - 3rem, var(--maxw)); margin-inline: auto; }
 .cmdk-footer kbd { margin-right: 0.15rem; }
 
 /* ---------- Reveal on scroll ---------- */
-[data-reveal] {
+/* Gated behind html.js so content is never hidden when JS is unavailable */
+html.js [data-reveal] {
   opacity: 0; transform: translateY(14px);
   transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
 }
-[data-reveal].in { opacity: 1; transform: none; }
+html.js [data-reveal].in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

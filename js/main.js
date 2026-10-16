@@ -59,9 +59,17 @@
     parts.forEach(function (el, i) {
       el.style.transitionDelay = (reduceMotion ? 0 : 90 + i * 55) + "ms";
     });
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { introLine.classList.add("in"); });
-    });
+
+    var introShown = false;
+    function showIntro() {
+      if (introShown) return;
+      introShown = true;
+      introLine.classList.add("in");
+    }
+    requestAnimationFrame(function () { requestAnimationFrame(showIntro); });
+    // Safety net: rAF is paused in background tabs, so guarantee the
+    // intro never stays invisible.
+    setTimeout(showIntro, 700);
   }
 
   /* ---------------- Scroll reveals ---------------- */
@@ -78,6 +86,18 @@
     }, { threshold: 0.15, rootMargin: "0px 0px -6% 0px" });
     revealEls.forEach(function (el) { io.observe(el); });
   }
+
+  // Safety net: if anything prevents the observer from firing, reveal
+  // whatever is already on screen rather than leaving it invisible.
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      revealEls.forEach(function (el) {
+        if (el.classList.contains("in")) return;
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) el.classList.add("in");
+      });
+    }, 1200);
+  });
 
   /* ---------------- Focus-reading epigraph ---------------- */
   var focusLines = Array.prototype.slice.call(document.querySelectorAll("[data-focus]"));
