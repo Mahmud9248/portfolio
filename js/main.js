@@ -81,6 +81,7 @@
   var dock = document.getElementById("dock");
   var pill = dock ? dock.querySelector(".dock-pill") : null;
   var activeLink = null;
+  var progressFill = document.getElementById("progress-fill");
 
   var sections = dock
     ? Array.prototype.slice
@@ -160,6 +161,17 @@
     setActive(current.link);
   }
 
+  /* ---------- Scroll progress ---------- */
+
+  function updateProgress() {
+    if (!progressFill) return;
+
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+
+    progressFill.style.width = Math.max(0, Math.min(100, pct)) + "%";
+  }
+
   /* ---------- Single scroll/rAF loop ---------- */
 
   var ticking = false;
@@ -168,6 +180,7 @@
     ticking = false;
     if (!prefersReducedMotion()) updateFocus();
     updateDock();
+    updateProgress();
   }
 
   function requestUpdate() {
