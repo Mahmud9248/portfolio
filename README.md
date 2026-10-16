@@ -9,7 +9,7 @@ Static, dependency-free, and built with plain HTML, CSS, and JavaScript.
 portfolio/
 ├── index.html          # Single-page site
 ├── css/style.css       # Greyscale dark theme (light mode included)
-├── js/main.js          # Theme toggle, ⌘K menu, scroll reveals, cursor previews
+├── js/main.js          # Theme toggle + scroll-driven focus effect
 ├── robots.txt          # Crawler rules
 ├── sitemap.xml         # Sitemap for search engines
 └── assets/
@@ -53,10 +53,23 @@ Works on any other static host too:
 - **Cloudflare Pages** — connect the repo, no build command, output dir `/`
 - **Netlify / Vercel** — drag the folder, or connect the repo
 
+## Design
+
+The site is a **typographic poster**: one measure, large type, raw on the
+background, and no cards, chips, borders, or rules. Visual hierarchy comes from
+*brightness* instead of labels — only four text tones exist.
+
+The signature interaction is the **focus effect**: as you scroll, each line
+brightens as it crosses the vertical centre of the viewport and dims as it
+leaves. It is driven entirely by a `--focus` custom property set per element in
+`js/main.js`, so the effect degrades to plain, fully-legible text when
+JavaScript is unavailable or `prefers-reduced-motion` is set.
+
 ## Customising
 
 | What | Where |
 |---|---|
 | Text content | `index.html` |
-| Colors & spacing | `:root` and `html[data-theme]` in `css/style.css` |
-| Animations | `.reveal` styles + `js/main.js` |
+| Colors, tones & spacing | `:root` and `html[data-theme="light"]` in `css/style.css` |
+| Motion | `[data-focus]` rules in `css/style.css` + `js/main.js` |
+| Focus strength | `FLOOR_STRONG` / `FLOOR_SOFT` / `SPREAD` in `js/main.js` |
