@@ -114,7 +114,7 @@
         var d = Math.abs(lineCenter - center) / falloff;
         var v = 1 - Math.min(d, 1);
         v = v * v;                       /* ease */
-        line.style.setProperty("--focus", (0.1 + v * 0.9).toFixed(3));
+        line.style.setProperty("--focus", (0.42 + v * 0.58).toFixed(3));
       });
     }
     function requestFocus() {
