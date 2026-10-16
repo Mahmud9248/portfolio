@@ -1,6 +1,7 @@
 /* =========================================================
    Abdullah Al Mahmud — portfolio
-   Typographic poster. Greyscale. Hierarchy from brightness.
+   Typographic poster behind a Liquid Glass layer.
+   Greyscale. Hierarchy from brightness and light, not labels.
    ========================================================= */
 
 :root {
@@ -12,10 +13,29 @@
   --text: #ededed;
   --tone-2: #c2c2c8;
   --tone-3: #9a9aa1;
-  --dim: #808085;
+  --dim: #87878d;
+
+  /* Ambient light field */
+  --orb: rgba(255, 255, 255, 0.075);
+  --orb-soft: rgba(255, 255, 255, 0.045);
+
+  /* Glass material */
+  --glass-bg: rgba(255, 255, 255, 0.055);
+  --glass-blur: 18px;
+  --glass-sat: 150%;
+  --glass-bright: 1.06;
+  --glass-sheen: rgba(255, 255, 255, 0.14);
+  --glass-drop: rgba(0, 0, 0, 0.5);
+  --glass-inset-hi: rgba(255, 255, 255, 0.16);
+  --glass-inset-lo: rgba(255, 255, 255, 0.04);
+  --glass-rim-a: rgba(255, 255, 255, 0.62);
+  --glass-rim-b: rgba(255, 255, 255, 0.06);
+  --glass-rim-c: rgba(255, 255, 255, 0.38);
+  --glass-fill: rgba(255, 255, 255, 0.13);
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
 
   color-scheme: dark;
 }
@@ -27,7 +47,20 @@ html[data-theme="light"] {
   --text: #111112;
   --tone-2: #3a3a40;
   --tone-3: #5a5a61;
-  --dim: #707076;
+  --dim: #6a6a70;
+
+  --orb: rgba(0, 0, 0, 0.05);
+  --orb-soft: rgba(0, 0, 0, 0.03);
+
+  --glass-bg: rgba(255, 255, 255, 0.5);
+  --glass-sheen: rgba(255, 255, 255, 0.8);
+  --glass-drop: rgba(17, 17, 18, 0.12);
+  --glass-inset-hi: rgba(255, 255, 255, 0.95);
+  --glass-inset-lo: rgba(17, 17, 18, 0.05);
+  --glass-rim-a: rgba(255, 255, 255, 0.95);
+  --glass-rim-b: rgba(17, 17, 18, 0.07);
+  --glass-rim-c: rgba(255, 255, 255, 0.6);
+  --glass-fill: rgba(255, 255, 255, 0.75);
 
   color-scheme: light;
 }
@@ -69,7 +102,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar {
@@ -104,17 +137,75 @@ body {
   position: fixed;
   top: -100px;
   left: 1rem;
-  z-index: 10000;
+  z-index: 10050;
   padding: 0.6rem 1rem;
   background: var(--text);
   color: var(--bg);
   font-size: 0.9rem;
   text-decoration: none;
-  border-radius: 0.4rem;
+  border-radius: 999px;
   transition: top 0.2s var(--ease);
 }
 .skip-link:focus {
   top: 1rem;
+}
+
+/* =========================================================
+   Ambient light field
+   Drifting greyscale light. Gives the glass something to
+   refract — without it, backdrop-filter has nothing to read.
+   ========================================================= */
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.orb-a {
+  width: 78vmax;
+  height: 78vmax;
+  top: -26vmax;
+  left: -20vmax;
+  background: radial-gradient(circle, var(--orb), transparent 62%);
+  animation: drift-a 44s ease-in-out infinite;
+}
+.orb-b {
+  width: 62vmax;
+  height: 62vmax;
+  right: -18vmax;
+  bottom: -12vmax;
+  background: radial-gradient(circle, var(--orb-soft), transparent 60%);
+  animation: drift-b 58s ease-in-out infinite;
+}
+.orb-c {
+  width: 46vmax;
+  height: 46vmax;
+  top: 32%;
+  left: 42%;
+  background: radial-gradient(circle, var(--orb-soft), transparent 64%);
+  animation: drift-c 71s ease-in-out infinite;
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(9vmax, 7vmax, 0) scale(1.14); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.06); }
+  50%      { transform: translate3d(-11vmax, -6vmax, 0) scale(1); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-7vmax, 9vmax, 0) scale(1.18); }
 }
 
 /* ---------- Film grain ---------- */
@@ -122,10 +213,63 @@ body {
 .grain {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: 10000;
   pointer-events: none;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   Glass material
+   Three layers: a translucent fill, a pointer-tracked
+   specular sheen, and a masked gradient rim on the edge.
+   ========================================================= */
+
+.glass {
+  position: relative;
+  background-color: var(--glass-bg);
+  background-image: radial-gradient(
+    200px 200px at var(--mx, 50%) var(--my, -10%),
+    var(--glass-sheen),
+    transparent 68%
+  );
+  box-shadow:
+    0 10px 32px -10px var(--glass-drop),
+    inset 0 1px 0.5px var(--glass-inset-hi),
+    inset 0 -1px 0.5px var(--glass-inset-lo);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat))
+    brightness(var(--glass-bright));
+}
+
+/* The specular rim: a 1px gradient hairline, brightest top-left
+   and bottom-right, near-invisible through the middle. */
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    var(--glass-rim-a) 0%,
+    var(--glass-rim-b) 24%,
+    var(--glass-rim-b) 52%,
+    var(--glass-rim-c) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Browsers without backdrop-filter get a solid, still-legible panel. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: var(--elev);
+  }
 }
 
 /* ---------- Theme toggle ---------- */
@@ -134,24 +278,25 @@ body {
   position: fixed;
   top: 1.15rem;
   right: 1.15rem;
-  z-index: 10000;
+  z-index: 10001;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: transparent;
-  color: var(--dim);
-  opacity: 0.5;
+  color: var(--tone-2);
   cursor: pointer;
-  transition: opacity 0.25s var(--ease), color 0.25s var(--ease);
+  transition: color 0.25s var(--ease), transform 0.25s var(--spring),
+    background-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-.theme-toggle:hover,
-.theme-toggle:focus-visible {
-  opacity: 1;
+.theme-toggle:hover {
   color: var(--text);
+  transform: scale(1.06);
+}
+.theme-toggle:active {
+  transform: scale(0.94);
 }
 .theme-toggle svg {
   grid-area: 1 / 1;
@@ -176,6 +321,8 @@ html[data-theme="light"] .icon-sun {
 
 main > section,
 .footer {
+  position: relative;
+  z-index: 1;
   width: min(calc(100% - 2.5rem), var(--maxw));
   margin-inline: auto;
 }
@@ -193,7 +340,6 @@ main > section {
 }
 
 .avatar {
-  position: relative;
   display: grid;
   place-items: center;
   width: 64px;
@@ -201,7 +347,8 @@ main > section {
   margin-bottom: clamp(1.7rem, 4vw, 2.8rem);
   border-radius: 50%;
   overflow: hidden;
-  background: var(--elev);
+  background-color: var(--elev);
+  background-image: none;
 }
 .avatar img {
   display: block;
@@ -217,6 +364,9 @@ main > section {
   letter-spacing: 0.08em;
   color: var(--dim);
   user-select: none;
+}
+.avatar.is-fallback {
+  background-color: var(--glass-bg);
 }
 .avatar.is-fallback .avatar-fallback {
   display: block;
@@ -244,27 +394,33 @@ main > section {
   color: var(--text);
 }
 
+/* ---------- Link capsules ---------- */
+
 .links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.7rem;
+  gap: 0.6rem;
   margin: clamp(1.9rem, 4.5vw, 3rem) 0 0;
   padding: 0;
   list-style: none;
 }
+
 .links a {
-  font-size: clamp(1rem, 2.1vw, 1.12rem);
-  color: var(--tone-3);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.26em;
-  transition: color 0.25s var(--ease), text-decoration-color 0.25s var(--ease);
+  display: inline-block;
+  padding: 0.6rem 1.15rem;
+  border-radius: 999px;
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  color: var(--tone-2);
+  text-decoration: none;
+  transition: color 0.25s var(--ease), transform 0.25s var(--spring),
+    background-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-.links a:hover,
-.links a:focus-visible {
+.links a:hover {
   color: var(--text);
-  text-decoration-color: currentColor;
+  transform: translateY(-2px);
+}
+.links a:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .meta-line {
@@ -411,6 +567,66 @@ main > section {
   text-decoration-color: currentColor;
 }
 
+/* =========================================================
+   Glass dock (iOS 26 tab bar)
+   ========================================================= */
+
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.15rem, env(safe-area-inset-bottom));
+  z-index: 9000;
+  display: flex;
+  padding: 0.4rem;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background-color: var(--glass-bg);
+}
+
+.dock-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  background-color: var(--glass-fill);
+  box-shadow:
+    inset 0 1px 0.5px var(--glass-inset-hi),
+    0 1px 3px -1px var(--glass-drop);
+  pointer-events: none;
+  transition: transform 0.5s var(--spring), width 0.5s var(--spring),
+    height 0.5s var(--spring), opacity 0.3s var(--ease);
+}
+
+.dock ul {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dock a {
+  display: block;
+  padding: 0.55rem 1.05rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--tone-2);
+  text-decoration: none;
+  transition: color 0.3s var(--ease);
+}
+.dock a:hover {
+  color: var(--text);
+}
+.dock a.is-active {
+  color: var(--text);
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
@@ -419,7 +635,7 @@ main > section {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem 1.6rem;
-  padding-block: 2.5rem 3.5rem;
+  padding-block: 2.5rem 8rem;
   font-size: 0.9rem;
   color: var(--dim);
 }
@@ -440,7 +656,45 @@ main > section {
   gap: 1.4rem;
 }
 
-/* ---------- Reduced motion ---------- */
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 620px) {
+  .dock {
+    bottom: max(0.85rem, env(safe-area-inset-bottom));
+    padding: 0.3rem;
+    max-width: calc(100% - 1.5rem);
+  }
+  .dock ul {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+  }
+  .dock ul::-webkit-scrollbar {
+    display: none;
+  }
+  .dock a {
+    padding: 0.5rem 0.66rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .dock a {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .dock a {
+    padding: 0.5rem 0.42rem;
+    font-size: 0.72rem;
+  }
+}
+
+/* ---------- Preference fallbacks ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -452,5 +706,19 @@ main > section {
   }
   [data-focus] {
     opacity: 1 !important;
+  }
+  .orb {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: var(--elev);
+  }
+  .ambient {
+    display: none;
   }
 }

@@ -9,7 +9,7 @@ Static, dependency-free, and built with plain HTML, CSS, and JavaScript.
 portfolio/
 ├── index.html          # Single-page site
 ├── css/style.css       # Greyscale dark theme (light mode included)
-├── js/main.js          # Theme toggle + scroll-driven focus effect
+├── js/main.js          # Theme, focus effect, glass sheen, glass dock
 ├── robots.txt          # Crawler rules
 ├── sitemap.xml         # Sitemap for search engines
 └── assets/
@@ -55,15 +55,39 @@ Works on any other static host too:
 
 ## Design
 
-The site is a **typographic poster**: one measure, large type, raw on the
-background, and no cards, chips, borders, or rules. Visual hierarchy comes from
-*brightness* instead of labels — only four text tones exist.
+Two layers.
 
-The signature interaction is the **focus effect**: as you scroll, each line
-brightens as it crosses the vertical centre of the viewport and dims as it
-leaves. It is driven entirely by a `--focus` custom property set per element in
-`js/main.js`, so the effect degrades to plain, fully-legible text when
-JavaScript is unavailable or `prefers-reduced-motion` is set.
+**The poster underneath** is unchanged in spirit: one measure, large type, raw
+on the background, no cards or rules. Hierarchy comes from *brightness* rather
+than labels — only four text tones exist.
+
+**The Liquid Glass layer on top** is a translucent material built from three
+stacked parts:
+
+1. a translucent fill plus a `backdrop-filter` blur,
+2. a **specular rim** — a 1px gradient hairline, brightest top-left and
+   bottom-right, near-invisible through the middle, drawn with a masked
+   pseudo-element,
+3. a **pointer-tracked sheen** that follows the cursor across the surface.
+
+It is used on the bottom dock, the theme toggle, the avatar, and every link
+capsule.
+
+### Why there's an ambient light field
+
+Glass is invisible over flat black — `backdrop-filter` needs variation behind it
+to refract. So `.ambient` holds three large, slowly drifting greyscale gradients
+(pure greys, no hue). They exist purely to give the glass something to read, and
+they're deliberately faint so they never compromise text contrast.
+
+### Graceful degradation
+
+| Condition | Result |
+|---|---|
+| No `backdrop-filter` | Solid `--elev` panels, still fully legible |
+| `prefers-reduced-transparency` | Glass goes opaque, ambient field hidden |
+| `prefers-reduced-motion` | Ambient drift stops, focus effect resolves to full opacity |
+| No JavaScript | Focus effect resolves to full opacity; dock pill simply stays put |
 
 ## Customising
 
@@ -71,5 +95,7 @@ JavaScript is unavailable or `prefers-reduced-motion` is set.
 |---|---|
 | Text content | `index.html` |
 | Colors, tones & spacing | `:root` and `html[data-theme="light"]` in `css/style.css` |
+| Glass material | `--glass-*` tokens in `css/style.css` |
+| Ambient light | `--orb` / `--orb-soft` and the `drift-*` keyframes |
 | Motion | `[data-focus]` rules in `css/style.css` + `js/main.js` |
 | Focus strength | `FLOOR_STRONG` / `FLOOR_SOFT` / `SPREAD` in `js/main.js` |
