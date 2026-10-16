@@ -61,24 +61,41 @@ Two layers.
 on the background, no cards or rules. Hierarchy comes from *brightness* rather
 than labels — only four text tones exist.
 
-**The Liquid Glass layer on top** is a translucent material built from three
+**The Liquid Glass layer on top** is a translucent material built from four
 stacked parts:
 
 1. a translucent fill plus a `backdrop-filter` blur,
-2. a **specular rim** — a 1px gradient hairline, brightest top-left and
+2. a **frosted texture** — fine desaturated noise tiled inside the glass, so it
+   reads as etched glass rather than a flat translucent rectangle,
+3. a **specular rim** — a 1px gradient hairline, brightest top-left and
    bottom-right, near-invisible through the middle, drawn with a masked
    pseudo-element,
-3. a **pointer-tracked sheen** that follows the cursor across the surface.
+4. inset edge lighting (a light top edge, a dark bottom edge) plus an outer
+   light **bloom**, which is what gives each surface apparent thickness.
 
-It is used on the bottom dock, the theme toggle, the avatar, and every link
-capsule.
+It is used on the bottom dock, the theme toggle, the avatar, every link
+capsule, every tool chip, the availability badge, the experience entries, and
+the highlights list. Everything shares the same tokens, so the material stays
+consistent across sizes; only the blur radius varies (large panels drop to
+`14px`, since there are several of them on screen at once).
+
+### Text on glass
+
+A lighter surface eats contrast, and the poster's mid-grey body text is tuned
+against the *background*, not against glass. Rather than dim the material,
+on-glass text gets its own floor: `--on-glass-3` is the dimmest tone permitted
+on a glass surface, chosen to hold **≥4.6:1** against the brightest ambient
+the orbs can put behind a panel.
 
 ### Why there's an ambient light field
 
 Glass is invisible over flat black — `backdrop-filter` needs variation behind it
-to refract. So `.ambient` holds three large, slowly drifting greyscale gradients
+to refract. So `.ambient` holds four large, slowly drifting greyscale gradients
 (pure greys, no hue). They exist purely to give the glass something to read, and
 they're deliberately faint so they never compromise text contrast.
+
+Their peak brightness is the constraint that sets `--on-glass-3`: turn the orbs
+up and that tone has to come up with them.
 
 ### Graceful degradation
 
@@ -87,7 +104,7 @@ they're deliberately faint so they never compromise text contrast.
 | No `backdrop-filter` | Solid `--elev` panels, still fully legible |
 | `prefers-reduced-transparency` | Glass goes opaque, ambient field hidden |
 | `prefers-reduced-motion` | Ambient drift stops, focus effect resolves to full opacity |
-| No JavaScript | Focus effect resolves to full opacity; dock pill simply stays put |
+| No JavaScript | Focus effect resolves to full opacity; dock pill stays put; progress bar stays empty |
 
 ## Customising
 
@@ -96,6 +113,7 @@ they're deliberately faint so they never compromise text contrast.
 | Text content | `index.html` |
 | Colors, tones & spacing | `:root` and `html[data-theme="light"]` in `css/style.css` |
 | Glass material | `--glass-*` tokens in `css/style.css` |
+| On-glass text floor | `--on-glass-3` in `css/style.css` (must clear 4.5:1 vs the orbs) |
 | Ambient light | `--orb` / `--orb-soft` and the `drift-*` keyframes |
 | Motion | `[data-focus]` rules in `css/style.css` + `js/main.js` |
 | Focus strength | `FLOOR_STRONG` / `FLOOR_SOFT` / `SPREAD` in `js/main.js` |
