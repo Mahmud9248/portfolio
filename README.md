@@ -40,7 +40,12 @@ npx serve .
 
 ## Deploy
 
-Pushing to `main` auto-deploys to GitHub Pages via
+GitHub Pages must be enabled **once** before auto-deploy works:
+
+1. Repo **Settings → Pages**
+2. **Build and deployment → Source: GitHub Actions**
+
+After that, every push to `main` deploys automatically via
 `.github/workflows/pages.yml` — live at <https://mahmud9248.github.io/portfolio/>.
 
 Works on any other static host too:

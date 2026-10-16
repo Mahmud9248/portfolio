@@ -1,5 +1,9 @@
 name: Deploy to GitHub Pages
 
+# NOTE: GitHub Pages must be enabled once, manually, before this will succeed:
+#   Repo Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+# After that, every push to main deploys automatically.
+
 on:
   push:
     branches: [main]
@@ -26,14 +30,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          # Enables GitHub Pages for this repo if it isn't already on
-          enablement: true
 
       - name: Stage site
         run: |
           mkdir -p _site
-          rsync -av --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
+          rsync -av --exclude='.git' --exclude='.github' --exclude='_site' --exclude='tools' ./ _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
