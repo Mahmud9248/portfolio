@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mahmud9248.github.io/portfolio/sitemap.xml
