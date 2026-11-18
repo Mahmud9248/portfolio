@@ -6,3 +6,7 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The pages.dev address forwards to kerakode.mahmudqa.cv; keep it out of search results.
+https://kerakode.pages.dev/*
+  X-Robots-Tag: noindex
