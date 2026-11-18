@@ -73,3 +73,19 @@ JavaScript is unavailable or `prefers-reduced-motion` is set.
 | Colors, tones & spacing | `:root` and `html[data-theme="light"]` in `css/style.css` |
 | Motion | `[data-focus]` rules in `css/style.css` + `js/main.js` |
 | Focus strength | `FLOOR_STRONG` / `FLOOR_SOFT` / `SPREAD` in `js/main.js` |
+
+## KeraKode (`kerakode/`)
+
+A standalone page for the KeraKode design & build studio, served at
+<https://kerakode.mahmudqa.cv>. It is self-contained: every asset it uses lives in
+`kerakode/assets/`, so the folder can be deployed on its own.
+
+**Deploy on Cloudflare Pages** (one time):
+
+1. Cloudflare dashboard → Workers & Pages → Create → Pages → connect this repo.
+2. Build command: *none*. Build output directory: `kerakode`.
+3. Custom domains → add `kerakode.mahmudqa.cv` (Cloudflare adds the DNS record).
+
+After that, every push to `main` redeploys it. `kerakode/_headers` sets security
+headers and long caching for `/assets/*`. Preview locally with
+`python -m http.server 5173 --directory kerakode`.

@@ -15,3 +15,7 @@ npm-debug.log*
 # Temp
 .tmp/
 *.log
+
+# Local tooling output
+.superpowers/
+graphify-out/
