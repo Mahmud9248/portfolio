@@ -1051,16 +1051,18 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
   /* ---- headings: decode like a terminal, every time they enter ---- */
   var glyphs = '!<>-_\\/[]{}=+*^?#01ABCDEFKX';
   function scramble(el) {
+    if (el._scr) return; el._scr = true;
     var nodes = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); while (w.nextNode()) nodes.push(w.currentNode);
     nodes.forEach(function (n) { if (!n.orig) n.orig = n.nodeValue; });
     var p = { v: 0 }; gsap.to(p, { v: 1, duration: 1.1, ease: 'power2.out', onUpdate: function () {
       nodes.forEach(function (n) { var o = n.orig, k = Math.floor(o.length * p.v), s = o.slice(0, k);
         for (var i = k; i < o.length; i++) s += o[i] === ' ' ? ' ' : glyphs[(Math.random() * glyphs.length) | 0]; n.nodeValue = s; }); },
-      onComplete: function () { nodes.forEach(function (n) { n.nodeValue = n.orig; }); } });
+      onComplete: function () { nodes.forEach(function (n) { n.nodeValue = n.orig; }); el._scr = false; } });
   }
   gsap.utils.toArray('.scr').forEach(function (h) {
     ScrollTrigger.create({ trigger: h, start: 'top 85%', onEnter: function () { scramble(h); }, onEnterBack: function () { scramble(h); } });
-    h.addEventListener('pointerenter', function () { scramble(h); });
+    h.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && !h._hov) { h._hov = true; scramble(h); } });
+    h.addEventListener('pointerleave', function () { setTimeout(function () { if (!h.matches(':hover')) h._hov = false; }, 400); });
     gsap.fromTo(h, { y: 80, opacity: 0 }, { y: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: h, start: 'top 100%', end: 'top 60%', scrub: true } });
     var dimPart = h.querySelector('span'); if (dimPart) gsap.fromTo(dimPart, { color: '#1e1e22' }, { color: '#5a5a60', ease: 'none', scrollTrigger: { trigger: h, start: 'top 75%', end: 'top 35%', scrub: true } });
   });
