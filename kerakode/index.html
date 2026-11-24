@@ -682,6 +682,10 @@ h2 span{color:var(--dim)}
 footer{padding:40px 0 30px;overflow:hidden}
 .giant{font:700 200px/1 var(--disp);letter-spacing:-.045em;white-space:nowrap;color:var(--s3);padding:.04em 0 .1em;display:inline-block}
 .giant span{color:#151518}.giant .gl{display:inline-block}
+/* wordmark lighting: each letter shows its slice of one word-wide spotlight (--lx/--ly), so the light reads as continuous */
+.giant{position:relative;--lx:50%;--ly:50%}
+.giant.lit .gl{color:transparent;background:radial-gradient(circle calc(var(--gw,1200px) * .26) at var(--lx) var(--ly),#f1f1ef 0%,#9a9aa0 22%,#3a3a40 48%,#1c1c20 72%,#18181b 100%) no-repeat;background-size:var(--gw) var(--gh);background-position:var(--ox,0) var(--oy,0);-webkit-background-clip:text;background-clip:text}
+.giant.lit>span .gl{opacity:.82}
 .fbar{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:28px;font:500 16px var(--disp);color:var(--t3)}
 
 
@@ -1235,8 +1239,27 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
 <script>
 // footer wordmark: scale the type so the whole word fits the content width exactly
 (function () { var g = document.getElementById('giant'); if (!g) return;
-  function fit() { g.style.fontSize = '200px'; var w = g.parentElement.clientWidth, n = g.scrollWidth; g.style.fontSize = Math.floor(200 * w / n * .985) + 'px'; }
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit); addEventListener('resize', fit); })();
+  function fit() { g.style.fontSize = '200px'; var w = g.parentElement.clientWidth, n = g.scrollWidth; g.style.fontSize = Math.floor(200 * w / n * .985) + 'px'; lay(); }
+  var gls = g.getElementsByClassName('gl');
+  function lay() { g.style.setProperty('--gw', g.offsetWidth + 'px'); g.style.setProperty('--gh', g.offsetHeight + 'px');
+    [].forEach.call(gls, function (s) { s.style.setProperty('--ox', -s.offsetLeft + 'px'); s.style.setProperty('--oy', -s.offsetTop + 'px'); }); }
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(fit); addEventListener('resize', fit);
+  g.classList.add('lit');
+  if (!window.gsap || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  /* light: drifts across the word on its own; on desktop it follows the mouse over the footer */
+  var L = { x: .5, y: .45 }, paint = function () { g.style.setProperty('--lx', L.x * 100 + '%'); g.style.setProperty('--ly', L.y * 100 + '%'); };
+  var idle = gsap.timeline({ repeat: -1, onUpdate: paint })
+    .to(L, { x: .9, y: .3, duration: 3.6, ease: 'sine.inOut' }).to(L, { x: .1, y: .7, duration: 7.2, ease: 'sine.inOut' }).to(L, { x: .5, y: .45, duration: 3.6, ease: 'sine.inOut' });
+  var foot = g.closest('footer') || g.parentElement;
+  foot.addEventListener('pointermove', function (e) { if (e.pointerType !== 'mouse') return; idle.pause(); var r = g.getBoundingClientRect();
+    gsap.to(L, { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, duration: .6, ease: 'power3.out', overwrite: true, onUpdate: paint }); });
+  foot.addEventListener('pointerleave', function () { gsap.to(L, { x: .5, y: .45, duration: 1, ease: 'power2.inOut', overwrite: true, onUpdate: paint, onComplete: function () { idle.restart(); } }); });
+  /* letters: hop when the mouse passes; on touch screens a wave rolls through every few seconds */
+  [].forEach.call(gls, function (s) { s.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'mouse') return;
+    gsap.to(s, { y: -0.07 * parseFloat(g.style.fontSize || 200), duration: .3, ease: 'power3.out', yoyo: true, repeat: 1, overwrite: 'auto' }); }); });
+  if (matchMedia('(hover:none)').matches) setInterval(function () { var r = g.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    gsap.to(gls, { y: -0.06 * parseFloat(g.style.fontSize || 200), duration: .35, ease: 'sine.inOut', stagger: .06, yoyo: true, repeat: 1 }); }, 4200);
+})();
 </script>
 <script>document.getElementById('yr').textContent=new Date().getFullYear()</script>
 </body></html>
