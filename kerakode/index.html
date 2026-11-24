@@ -454,7 +454,7 @@ h2 span{color:var(--dim)}
 .pv-qa .r{font:400 12.5px/1 var(--code);padding:9px 10px;border-radius:8px;background:var(--bg);margin-bottom:6px;animation:msg 4s infinite}
 .pv-qa .r:nth-child(2){animation-delay:.4s}.pv-qa .r:nth-child(3){animation-delay:.8s}.pv-qa .r:nth-child(4){animation-delay:1.2s}
 .pv-qa .r.bad{color:#ffb4b4}.pv-qa .sum{font:600 13px var(--disp);margin-top:4px}
-@media (hover:none),(max-width:960px){.svc-pv{display:none}.svc a{grid-template-columns:64px 1fr auto}}
+@media (hover:none),(max-width:960px){.svc-pv{transform-origin:100% 100%}.svc a{grid-template-columns:64px 1fr auto}}
 
 /* KeraKode brand: an extruded 3D K and letters that flip */
 .k3d{position:relative;display:inline-block;width:30px;height:30px;transform-style:preserve-3d;perspective:none;animation:kspin 7s cubic-bezier(.65,0,.35,1) infinite}
@@ -572,13 +572,11 @@ h2 span{color:var(--dim)}
 .pv-port .cap{font:500 11px var(--disp);color:var(--t2);margin-top:8px}.pv-port .cap .cs{color:var(--ink)}
 /* ================= phone layout fixes ================= */
 @media (max-width:960px){
-  /* timeline: no pinning on phones, swipe the cards sideways instead */
-  .tl-wrap{height:auto;overflow:visible;padding:20px 0 10px}
-  .tl-head{flex-direction:column;align-items:flex-start;margin-bottom:26px}
-  .track{width:auto;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:14px;margin:0 calc(-1 * clamp(18px,3.6vw,56px));padding-left:clamp(18px,3.6vw,56px);padding-right:clamp(18px,3.6vw,56px);scrollbar-width:none}
-  .track::-webkit-scrollbar{display:none}
-  .tcard{scroll-snap-align:start;width:82vw;height:auto;min-height:380px}
-  .tl-bar{display:none}
+  /* timeline: pinned and slides sideways as you scroll, same as desktop */
+  .tl-wrap{height:100svh;padding-top:64px}
+  .tl-head{flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:22px}
+  .tl-bar{margin-bottom:20px}
+  .tcard{width:82vw;height:auto;min-height:380px}
   /* devices: bigger phone, shorter pinned run */
   .devices{height:220vh}
   .rig{padding:0 22% 16% 0}
@@ -685,6 +683,19 @@ footer{padding:40px 0 30px;overflow:hidden}
 
 @media(max-width:960px){.hero,.proj,.why{grid-template-columns:1fr}.proj{position:relative;top:0;min-height:0;padding:22px}.steps{grid-template-columns:1fr}.svc a{grid-template-columns:64px 1fr auto}.ico{width:64px;height:64px}.ico svg{width:38px;height:38px}.svc p{grid-column:2/-1;grid-row:2}.links a:not(.btn){display:none}.float{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.js .ln>span{transform:none}.grain,.spot,.cur-dot,.cur-ring{display:none}}
+/* ================= phones: same motion as desktop, nothing wider than the screen ================= */
+html{overflow-x:clip}.devices{overflow-x:clip}
+@media (max-width:420px){.btn.sm{padding:0 16px;font-size:15px}}
+@media (max-width:960px) and (max-height:760px){.tl-head p{display:none}.tcard{min-height:330px}}
+@media (max-width:960px){
+  .float{display:flex;gap:8px;padding:8px 11px;border-radius:11px;font-size:12.5px}
+  .float small{font-size:10.5px}.f2 .ring{width:26px;height:26px}
+  .f1{left:-4px;top:-20px}.f2{right:-4px;top:30%}.f3{left:-4px;bottom:-20px}
+  .proj{position:sticky;transform-origin:center bottom}
+  .svc>a.rv.live{background:var(--s2)}.svc a.live .ico{background:var(--ink);transform:rotate(-6deg) scale(1.06)}.svc a.live .ico svg{stroke:#0a0a0a}.svc a.live .ico svg .fill{fill:#0a0a0a}
+  .svc a.live h3{color:var(--ink)}.svc a.live .stags span{background:var(--s3);color:var(--ink)}
+  .svc .ico{transition:transform .5s var(--ease),background .4s}
+}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute"><defs>
  <symbol id="k" viewBox="0 0 64 64"><rect x="10" y="10" width="7" height="44" rx="1.5"/><polyline points="42,10 22,32 42,54" fill="none" stroke="currentColor" stroke-width="7"/><rect class="caret" x="46" y="46" width="10" height="8"/></symbol>
@@ -999,6 +1010,15 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
   addEventListener('pointermove', function (e) { var cx = e.clientX / innerWidth - .5, cy = e.clientY / innerHeight - .5;
     gsap.to('.term', { rotateY: cx * 6, rotateX: -cy * 6, duration: .8, ease: 'power3.out', transformPerspective: 1000 });
     gsap.utils.toArray('.float').forEach(function (f) { var d = +f.dataset.depth; gsap.to(f, { x: cx * 30 * d, duration: 1, ease: 'power3.out' }); }); });
+  // touch screens have no cursor: the terminal and its floats sway on their own, and the light drifts
+  if (matchMedia('(hover:none)').matches) {
+    gsap.fromTo('.term', { rotateY: -6, transformPerspective: 1000 }, { rotateY: 6, duration: 4.2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    gsap.fromTo('.term', { rotateX: 4 }, { rotateX: -4, duration: 5.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    gsap.utils.toArray('.float').forEach(function (f) { var d = +f.dataset.depth; gsap.fromTo(f, { x: -5 * d }, { x: 5 * d, duration: 4.2, yoyo: true, repeat: -1, ease: 'sine.inOut' }); });
+    var lt = { x: 20, y: 18 };
+    gsap.to(lt, { keyframes: [{ x: 80, y: 30 }, { x: 70, y: 75 }, { x: 25, y: 60 }, { x: 20, y: 18 }], duration: 16, repeat: -1, ease: 'sine.inOut',
+      onUpdate: function () { root.style.setProperty('--mx', lt.x + '%'); root.style.setProperty('--my', lt.y + '%'); } });
+  }
 
   var navEl = document.querySelector('nav'); function navBar() { navEl.classList.toggle('solid', scrollY > 40); } addEventListener('scroll', navBar, { passive: true }); navBar();
   /* ---- scroll: progress bar, hero drifts away ---- */
@@ -1040,8 +1060,12 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
     ScrollTrigger.create({ trigger: c, start: 'top 70%', onEnter: function () { c.classList.add('in'); } });
     var shot = c.querySelector('.shot');
     gsap.fromTo(shot, { clipPath: 'inset(16% 12% 16% 12% round 14px)' }, { clipPath: 'inset(0% 0% 0% 0% round 14px)', ease: 'none', scrollTrigger: { trigger: c, start: 'top 100%', end: 'top 30%', scrub: true } });
-    if (i < cards.length - 1 && innerWidth > 960) gsap.to(c, { scale: .92, filter: 'brightness(.45)', ease: 'none', scrollTrigger: { trigger: cards[i + 1], start: 'top 100%', end: 'top 110px', scrub: true } });
+    if (i < cards.length - 1) gsap.to(c, { scale: .92, filter: 'brightness(.45)', ease: 'none', scrollTrigger: { trigger: cards[i + 1], start: 'top 100%', end: innerWidth > 960 ? 'top 110px' : 'top 15%', scrub: true } });
   });
+  // phones: cards are taller than the screen, so each sticks once its bottom reaches the screen bottom and the next slides over it
+  function stickTops() { if (innerWidth > 960) { cards.forEach(function (c) { c.style.top = ''; }); return; }
+    cards.forEach(function (c) { c.style.top = Math.min(76, innerHeight - c.offsetHeight - 16) + 'px'; }); }
+  stickTops(); ScrollTrigger.addEventListener('refreshInit', stickTops);
 
   /* ---- process panels tilt in with scroll ---- */
   gsap.utils.toArray('.step').forEach(function (s, i) {
@@ -1060,6 +1084,11 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
   document.querySelectorAll('.btn,.svc .arr').forEach(function (b) {
     b.addEventListener('pointermove', function (e) { var r = b.getBoundingClientRect(); gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * .2, y: (e.clientY - r.top - r.height / 2) * .3, duration: .4 }); });
     b.addEventListener('pointerleave', function () { gsap.to(b, { x: 0, y: 0, duration: .7, ease: 'elastic.out(1,.4)' }); });
+  });
+  /* ---- touch: buttons and tiles squash on press and spring back ---- */
+  document.querySelectorAll('.btn,.svc a,.tool,.proj .go').forEach(function (b) {
+    b.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse') return; gsap.to(b, { scale: .94, duration: .15, ease: 'power2.out' }); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { b.addEventListener(ev, function (e) { if (e.pointerType === 'mouse') return; gsap.to(b, { scale: 1, duration: .8, ease: 'elastic.out(1,.35)' }); }); });
   });
 })();
 </script>
@@ -1121,7 +1150,7 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
       if (i !== cur) { cur = i; lap.forEach(function (im, k) { im.classList.toggle('on', k === i); }); ph.forEach(function (im, k) { im.classList.toggle('on', k === i); });
         gsap.fromTo([dn, ds], { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .5, stagger: .06 }); dn.textContent = names[i][0]; ds.textContent = names[i][1]; } } } });
   tl.fromTo('#laptop', { rotateX: 14, y: 60, scale: .94, opacity: .35 }, { rotateX: 0, y: 0, scale: 1, opacity: 1, duration: .18, ease: 'power2.out' })
-    .fromTo('#phone', { x: 80, y: 40, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: .14, ease: 'power2.out' }, .08)
+    .fromTo('#phone', { x: innerWidth > 960 ? 80 : 0, y: innerWidth > 960 ? 40 : 70, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: .14, ease: 'power2.out' }, .08)
     .to('#laptop', { y: -14, duration: .82, ease: 'none' }, .18)
     .to('#phone', { y: 18, duration: .82, ease: 'none' }, .18);
   // the pair leans a little toward the cursor
@@ -1129,6 +1158,9 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
   dvs.addEventListener('pointermove', function (e) { var r = dvs.getBoundingClientRect(), cx = (e.clientX - r.left) / r.width - .5, cy = (e.clientY - r.top) / r.height - .5;
     gsap.to('#rig', { rotateY: cx * 6, rotateX: -cy * 4, duration: .8, ease: 'power3.out' }); });
   dvs.addEventListener('pointerleave', function () { gsap.to('#rig', { rotateY: 0, rotateX: 0, duration: 1, ease: 'power3.out' }); });
+  var touch = matchMedia('(hover:none), (max-width:960px)').matches;
+  if (touch) { gsap.fromTo('#rig', { rotateY: -5 }, { rotateY: 5, duration: 4.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    gsap.fromTo('#rig', { rotateX: 3 }, { rotateX: -3, duration: 6, yoyo: true, repeat: -1, ease: 'sine.inOut' }); }
 
   /* ---- services: floating live preview follows the cursor ---- */
   (function () {
@@ -1137,27 +1169,44 @@ for(var i=0;i<84;i++)h+='<text x="9" y="'+(i*1.6)+'">'+L[i%L.length]+'  '+L[(i*7
     var lastX = 0, mx = -1, my = -1;
     // scrolling moves rows without a pointer event, so re-check what is under the cursor
     addEventListener('scroll', function () { var el = mx < 0 ? null : document.elementFromPoint(mx, my), row = el && el.closest('.svc a[data-pv]'); if (!row) gsap.to(pv, { opacity: 0, scale: .6, duration: .25 }); }, { passive: true });
-    document.querySelectorAll('.svc a[data-pv]').forEach(function (a) {
-      a.addEventListener('pointerenter', function () {
-        var t = pv.querySelector('template[data-k="' + a.dataset.pv + '"]'); pin.innerHTML = t.innerHTML;
-        var cal = pin.querySelector('.cal'); if (cal) { var h = ''; for (var i = 1; i <= 21; i++) h += '<i class="' + (i === 18 ? 'sel' : '') + '"></i>'; cal.innerHTML = h; }
-        var lc = pin.querySelector('.ln-count'); if (lc) { var lo = { v: 1284 }; gsap.to(lo, { v: 1312, duration: 3, repeat: -1, ease: 'steps(28)', onUpdate: function () { lc.textContent = Math.round(lo.v).toLocaleString('en-US'); } }); }
-        var cs = pin.querySelector('.cs'); if (cs) { var cases = ['Brand identity', 'Product launch', 'Photo series'], ci2 = 0; (function cyc() { if (!pin.contains(cs)) return; cs.textContent = cases[ci2++ % 3]; setTimeout(cyc, 1400); })(); }
-        var cnt = pin.querySelector('.cnt'); if (cnt) { var o = { v: 30000 }; gsap.to(o, { v: 42000, duration: 2.6, repeat: -1, ease: 'steps(12)', onUpdate: function () { cnt.textContent = '৳ ' + Math.round(o.v).toLocaleString('en-US'); } }); }
-        gsap.to(pv, { opacity: 1, scale: 1, duration: .5, ease: 'expo.out' });
+    var live = [], shown = null;
+    function fill(a) {
+      if (shown === a) return; shown = a; live.forEach(function (t) { t.kill(); }); live = [];
+      var t = pv.querySelector('template[data-k="' + a.dataset.pv + '"]'); pin.innerHTML = t.innerHTML;
+      var cal = pin.querySelector('.cal'); if (cal) { var h = ''; for (var i = 1; i <= 21; i++) h += '<i class="' + (i === 18 ? 'sel' : '') + '"></i>'; cal.innerHTML = h; }
+      var lc = pin.querySelector('.ln-count'); if (lc) { var lo = { v: 1284 }; live.push(gsap.to(lo, { v: 1312, duration: 3, repeat: -1, ease: 'steps(28)', onUpdate: function () { lc.textContent = Math.round(lo.v).toLocaleString('en-US'); } })); }
+      var cs = pin.querySelector('.cs'); if (cs) { var cases = ['Brand identity', 'Product launch', 'Photo series'], ci2 = 0; (function cyc() { if (!pin.contains(cs)) return; cs.textContent = cases[ci2++ % 3]; setTimeout(cyc, 1400); })(); }
+      var cnt = pin.querySelector('.cnt'); if (cnt) { var o = { v: 30000 }; live.push(gsap.to(o, { v: 42000, duration: 2.6, repeat: -1, ease: 'steps(12)', onUpdate: function () { cnt.textContent = '৳ ' + Math.round(o.v).toLocaleString('en-US'); } })); }
+    }
+    if (matchMedia('(hover:none), (max-width:960px)').matches) {
+      // phones: no cursor to follow, so the preview docks in the bottom-right corner and swaps as each tile passes mid-screen
+      var S = Math.min(.62, (innerWidth * .56) / 330);
+      function dock() { gsap.set(pv, { x: innerWidth - 330 - 12, y: innerHeight - 220 - 20, rotate: -4 }); } dock(); addEventListener('resize', dock);
+      var tiles = gsap.utils.toArray('.svc a[data-pv]');
+      tiles.forEach(function (a, i) {
+        ScrollTrigger.create({ trigger: a, start: 'top ' + (i % 2 ? 46 : 60) + '%', end: 'bottom ' + (i % 2 ? 46 : 60) + '%',
+          onToggle: function (st) { a.classList.toggle('live', st.isActive); if (st.isActive) { fill(a); gsap.fromTo(pv, { scale: S * .9 }, { opacity: 1, scale: S, duration: .5, ease: 'expo.out' }); } } });
       });
-      a.addEventListener('pointerleave', function () { gsap.to(pv, { opacity: 0, scale: .6, duration: .35 }); });
+      ScrollTrigger.create({ trigger: '.svc', start: 'top 60%', end: 'bottom 46%', onLeave: hide, onLeaveBack: hide });
+      function hide() { shown = null; gsap.to(pv, { opacity: 0, scale: S * .7, duration: .3 }); }
+      return;
+    }
+    document.querySelectorAll('.svc a[data-pv]').forEach(function (a) {
+      a.addEventListener('pointerenter', function () { fill(a); gsap.to(pv, { opacity: 1, scale: 1, duration: .5, ease: 'expo.out' }); });
+      a.addEventListener('pointerleave', function () { shown = null; gsap.to(pv, { opacity: 0, scale: .6, duration: .35 }); });
       a.addEventListener('pointermove', function (e) { mx = e.clientX; my = e.clientY; });
       a.addEventListener('pointermove', function (e) { px(e.clientX + 30); py(e.clientY - 110); rot(gsap.utils.clamp(-10, 10, (e.clientX - lastX) * .6)); lastX = e.clientX; });
     });
   })();
   /* ---- horizontal timeline: pin and slide sideways ---- */
   var track = document.getElementById('track');
-  if (innerWidth > 960) {
+  {
     var dist = function () { return track.scrollWidth - track.parentElement.clientWidth; };
     gsap.to(track, { x: function () { return -dist(); }, ease: 'none', scrollTrigger: { trigger: '#tlWrap', start: 'top top', end: function () { return '+=' + dist(); }, pin: true, scrub: 1, invalidateOnRefresh: true,
       onUpdate: function (st) { gsap.set('#tlBar', { scaleX: st.progress }); } } });
   }
+  // the timeline pin was created after triggers further down the page: re-order so their positions include its height
+  ScrollTrigger.sort(); ScrollTrigger.refresh();
   var bc = document.getElementById('bugCount'), o = { v: 0 };
   gsap.to(o, { v: 47, duration: 2.2, ease: 'power2.out', onUpdate: function () { bc.textContent = Math.round(o.v); }, scrollTrigger: { trigger: bc, start: 'top 90%', toggleActions: 'restart none none reset' } });
 })();
